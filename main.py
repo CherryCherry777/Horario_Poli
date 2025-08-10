@@ -166,7 +166,8 @@ def eliminar_materia(fila_materia):
 
 def eliminar_todas():
   for i in range(1,hoja2.max_row+1):
-    hoja2.delete_rows(i)
+    hoja2.delete_rows(1)
+    #print("Eliminada fila ",i)
 
   doc2.save(path2)
   return
