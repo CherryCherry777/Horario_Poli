@@ -7,6 +7,7 @@ from openpyxl import Workbook
 from colorama import Fore
 import os
 from tabulate import tabulate
+from datetime import time
 print(Fore.GREEN + "Cargando..." + Fore.WHITE)
 path = "horario.xlsx"
 path2 = "horario_guardado.xlsx"
@@ -26,18 +27,18 @@ if (os.path.exists(path2)):
     print(Fore.GREEN + "Horario personalizado cargado exitosamente." + Fore.WHITE)
     doc2 = openpyxl.load_workbook(path2)
     hoja2 = doc2.active
-    filas2 = hoja2.max_row
   except Exception as e:
     print("El horario personalizado no pudo ser cargado.")
 else:
   print(Fore.GREEN + "Creando archivo de horario personalizado..." + Fore.WHITE)
+  #time.sleep(5)
   doc2 = Workbook()
   doc2.save(path2)
   hoja2 = doc2.active
-  filas2 = 0
 
 
-
+#TODO try except every input so that there arent sudden errors
+#TODO change every while(True) to a loop of max 100
 
 
 
@@ -61,109 +62,226 @@ col_viernes_aula = 43
 col_sabado_aula = 45
 columnas = 47
 
-carreras = ["IAE","ICM","IEK","IEL","IEN","IIN","IMK","ISP","LCA","LCI","LCIk","LEL","LGH","TSE","Cnel. Oviedo","Villarica"]
-carreras_upper = ["IAE","ICM","IEK","IEL","IEN","IIN","IMK","ISP","LCA","LCI","LCIK","LEL","LGH","TSE","CNEL. OVIEDO","VILLARICA"]
-
-aulas_a = ["A50","A51","A52","A53","A54","A55","A56","A57","A58","A59"]
-aulas_b = ["B01","B02"]
-aulas_c = ["C01","C02","C03","C04"]
-aulas_e = ["E01","E02","E03","E04"]
-aulas_f = ["F05","F06","F07","F08","F09","F10","F11","F12","F13","F14","F15","F16","F17","F18","F25","F29","F30","F31","F33","F34","F35","F36","F37","F38","F39","F40"]
-aulas_h = ["H03","H04","H05","H06","H07","H08"]
-aulas_i = ["I01","I02","I03","I04","I05","I06","I07","I08"]
-
+global carreras
+carreras = ["IAE","ICM","IEK","IEL","IEN","IIN","IMK","ISP","LCA","LCI","LCIk","LEL","LGH","TSE"]
+global carreras_upper
+carreras_upper = ["IAE","ICM","IEK","IEL","IEN","IIN","IMK","ISP","LCA","LCI","LCIK","LEL","LGH","TSE"]
+"""
+def refrescar_aulas():
+  global aulas_a
+  global aulas_b
+  global aulas_c
+  global aulas_e
+  global aulas_f
+  global aulas_h
+  global aulas_i
+  aulas_a = ["A50","A51","A52","A53","A54","A55","A56","A57","A58","A59"]
+  aulas_b = ["B01","B02"]
+  aulas_c = ["C01","C02","C03","C04"]
+  aulas_e = ["E01","E02","E03","E04"]
+  aulas_f = ["F05","F06","F07","F08","F09","F10","F11","F12","F13","F14","F15","F16","F17","F18","F25","F29","F30","F31","F33","F34","F35","F36","F37","F38","F39","F40"]
+  aulas_h = ["H03","H04","H05","H06","H07","H08"]
+  aulas_i = ["I01","I02","I03","I04","I05","I06","I07","I08"]
+"""
+def refrescar_aulas():
+  global aulas
+  aulas = [["A50","A51","A52","A53","A54","A55","A56","A57","A58","A59"],
+  ["B01","B02"],
+  ["C01","C02","C03","C04"],
+  ["E01","E02","E03","E04"],
+  ["F05","F06","F07","F08","F09","F10","F11","F12","F13","F14","F15","F16","F17","F18","F25","F29","F30","F31","F33","F34","F35","F36","F37","F38","F39","F40"],
+  ["H03","H04","H05","H06","H07","H08"],
+  ["I01","I02","I03","I04","I05","I06","I07","I08"]]
 #Una celda vacia se presenta como "None"
 
 #hoja = doc[nombreHoja]
 
-def imprimir_info_materia_2(hoja, fila_materia):
-  mat_aux = [[]]
+
+def crear_linea_horario(hoja, fila_materia):
+  mat_aux = []
   #especificamente para imprimir UNA materia del horario
-  print("Materia: ", hoja.cell(row = fila_materia, column = col_materia).value, " - ", hoja.cell(row = fila_materia, column = col_seccion).value)
-  print("Profesor: ",hoja.cell(row = fila_materia, column = col_prof_titulo).value,hoja.cell(row = fila_materia, column= col_prof_nombre).value,hoja.cell(row = fila_materia, column= col_prof_apellido).value)
-  print("      Lunes         -     Martes        -     Miércoles     -     Jueves        -     Viernes       -     Sábado")
+  #retorna un vector, para que imprima correctamente debe estar dentro de una matriz
   if(str(hoja.cell(row = fila_materia, column = col_lunes).value) == "None"):
-    mat_aux[0].append("")
+    mat_aux.append("")
   else:
-    mat_aux[0].append(hoja.cell(row=fila_materia,column = col_lunes_aula).value + " " + hoja.cell(row = fila_materia, column = col_lunes).value)
+    mat_aux.append(hoja.cell(row=fila_materia,column = col_lunes_aula).value + " " + hoja.cell(row = fila_materia, column = col_lunes).value)
 
   if(str(hoja.cell(row = fila_materia, column = col_martes).value) == "None"):
-    mat_aux[0].append("")
+    mat_aux.append("")
   else:
-    mat_aux[0].append(hoja.cell(row=fila_materia,column = col_martes_aula).value + " " + hoja.cell(row = fila_materia, column = col_martes).value)
+    mat_aux.append(hoja.cell(row=fila_materia,column = col_martes_aula).value + " " + hoja.cell(row = fila_materia, column = col_martes).value)
 
   if(str(hoja.cell(row = fila_materia, column = col_miercoles).value) == "None"):
-    mat_aux[0].append("")
+    mat_aux.append("")
   else:
-    mat_aux[0].append(hoja.cell(row=fila_materia,column = col_miercoles_aula).value + " " + hoja.cell(row = fila_materia, column = col_miercoles).value)
+    mat_aux.append(hoja.cell(row=fila_materia,column = col_miercoles_aula).value + " " + hoja.cell(row = fila_materia, column = col_miercoles).value)
 
   if(str(hoja.cell(row = fila_materia, column = col_jueves).value) == "None"):
-    mat_aux[0].append("")
+    mat_aux.append("")
   else:
-    mat_aux[0].append(hoja.cell(row=fila_materia,column = col_jueves_aula).value + " " + hoja.cell(row = fila_materia, column = col_jueves).value)
+    mat_aux.append(hoja.cell(row=fila_materia,column = col_jueves_aula).value + " " + hoja.cell(row = fila_materia, column = col_jueves).value)
 
   if(str(hoja.cell(row = fila_materia, column = col_viernes).value) == "None"):
-    mat_aux[0].append("")
+    mat_aux.append("")
   else:
-    mat_aux[0].append(hoja.cell(row=fila_materia,column = col_viernes_aula).value + " " + hoja.cell(row = fila_materia, column = col_viernes).value)
+    mat_aux.append(hoja.cell(row=fila_materia,column = col_viernes_aula).value + " " + hoja.cell(row = fila_materia, column = col_viernes).value)
 
   if(str(hoja.cell(row = fila_materia, column = col_sabado).value) == "None"):
-    mat_aux[0].append("")
+    mat_aux.append("")
   else:
-    mat_aux[0].append(hoja.cell(row=fila_materia,column = col_sabado_aula).value + " " + hoja.cell(row = fila_materia, column = col_sabado).value)
+    mat_aux.append(hoja.cell(row=fila_materia,column = col_sabado_aula).value + " " + hoja.cell(row = fila_materia, column = col_sabado).value)
 
-  print(tabulate(mat_aux,headers=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"]))
+  #print(tabulate(mat_aux,headers=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"]))
 
-
-
-def imprimir_info_materia(hoja, fila_materia):
-  #especificamente para imprimir UNA materia del horario
-  print("Materia: ", hoja.cell(row = fila_materia, column = col_materia).value, " - ", hoja.cell(row = fila_materia, column = col_seccion).value)
-  print("Profesor: ",hoja.cell(row = fila_materia, column = col_prof_titulo).value,hoja.cell(row = fila_materia, column= col_prof_nombre).value,hoja.cell(row = fila_materia, column= col_prof_apellido).value)
-  print("      Lunes         -     Martes        -     Miércoles     -     Jueves        -     Viernes       -     Sábado")
-  if(str(hoja.cell(row = fila_materia, column = col_lunes).value) == "None"):
-    print(" "*20, end="")
-  else:
-    print("  ",hoja.cell(row=fila_materia,column = col_lunes_aula).value," ",hoja.cell(row = fila_materia, column = col_lunes).value," ",end="",sep="")
-
-  if(str(hoja.cell(row = fila_materia, column = col_martes).value) == "None"):
-    print(" "*20, end="")
-  else:
-    print("  ",hoja.cell(row=fila_materia,column = col_martes_aula).value," ",hoja.cell(row = fila_materia, column = col_martes).value," ",end="",sep="")
-
-  if(str(hoja.cell(row = fila_materia, column = col_miercoles).value) == "None"):
-    print(" "*20, end="")
-  else:
-    print("  ",hoja.cell(row=fila_materia,column = col_miercoles_aula).value," ",hoja.cell(row = fila_materia, column = col_miercoles).value," ",end="",sep="")
-
-  if(str(hoja.cell(row = fila_materia, column = col_jueves).value) == "None"):
-    print(" "*20, end="")
-  else:
-    print("  ",hoja.cell(row=fila_materia,column = col_jueves_aula).value," ",hoja.cell(row = fila_materia, column = col_jueves).value," ",end="",sep="")
-
-  if(str(hoja.cell(row = fila_materia, column = col_viernes).value) == "None"):
-    print(" "*20, end="")
-  else:
-    print("  ",hoja.cell(row=fila_materia,column = col_viernes_aula).value," ",hoja.cell(row = fila_materia, column = col_viernes).value," ",end="",sep="")
-
-  if(str(hoja.cell(row = fila_materia, column = col_sabado).value) != "None"):
-    print("  ",hoja.cell(row=fila_materia,column = col_sabado_aula).value," ",hoja.cell(row = fila_materia, column = col_sabado).value," ",end="",sep="")
+  return mat_aux
 
 def ver_horario():
-  print("Lista de materias:")
-  for i in range (filas2 + 1):
-    print(i+1,"-",hoja2.cell(row=i+1,column=col_materia).value,"-",hoja2.cell(row=i+1,column=col_seccion).value,"- Prof:",hoja2.cell(row = i+1, column = col_prof_titulo).value,hoja2.cell(row = i+1, column= col_prof_nombre).value,hoja2.cell(row = i+1, column= col_prof_apellido).value)
+  #esto es para imprimir el horario guardado
+  mat_aux = [[]]
+  linea_aux = []
+  for i in range(1,hoja2.max_row+1):
+    if(hoja2.cell(row=i,column=col_materia).value is not None):
+      linea_aux = crear_linea_horario(hoja2,i)
+      linea_aux.insert(0,str(hoja2.cell(row=i,column=col_materia).value)+" "+str(hoja2.cell(row=i,column=col_seccion).value))
+      mat_aux.append(linea_aux)
 
-  print("Materia              ")
+  if(len(mat_aux[0]) != 0):
+    print(tabulate(mat_aux,headers=["Materia","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"]))
+  else:
+    print("\nNo hay materias guardadas.")
+
+  print("\n\nPresione enter para continuar.")
+  input()
+
+  return
+
+def eliminar_materia(fila_materia):
+  hoja2.delete_rows(fila_materia)  
+  doc2.save(path2)
+  return
+
+def eliminar_todas():
+  if (hoja2.max_row != 0):
+
+    for i in range(1,hoja2.max_row):
+      hoja2.delete_rows(i)
+
+  doc2.save(path2)
+  return
+
+def modificar_horario():
+
+  while(True):
+    print("Elija la materia que desea eliminar")
+    for i in range(1,hoja2.max_row+1):
+      print(i,"-",hoja2.cell(row = i,column=col_materia).value,"-",hoja2.cell(row=i,column=col_seccion).value,"- Prof",hoja2.cell(row=i,column=col_prof_titulo).value,hoja2.cell(row=i,column=col_prof_nombre).value,hoja2.cell(row=i,column=col_prof_apellido).value)
+
+    print(hoja2.max_row+1,"- Todas")
+    print(hoja2.max_row+2,"- Volver al menu")
+
+    seleccion = int(input())
+
+    if (0 < seleccion <= hoja2.max_row):
+      print("Esta seguro? Escriba si para continuar, escriba otra cosa para cancelar.")
+      conf = input().lower()
+      if(conf == "si"):
+        eliminar_materia(seleccion)
+        print("Materia eliminada exitosamente.")
+        break
+      else:
+        break
+    elif(seleccion == hoja2.max_row+1):
+      print("Esta seguro de querer eliminar todo? Escriba si para continuar, escriba otra cosa para cancelar.")
+      conf = input().lower()
+      if(conf == "si"):
+        eliminar_todas()
+        print("Horario borrado exitosamente.")
+        break
+      else:
+        break
+    elif(seleccion == hoja2.max_row+2):
+      break
+    else:
+      print("Esa no es una seleccion valida.")
+
+  return
+
+def comparar_horas(inicio,fin,horario_inic,horario_fin):
+  #devuelve 1 si se solapan, 0 si no
+  if(inicio < horario_inic):
+    if(fin<=horario_inic):
+      #el bloque de tiempo es antes de la clase
+      return 0
+    elif(fin>horario_inic):
+      #se intersectan
+      return 1
+    else:
+      print(Fore.RED+"Error inesperado en la comparacion de horas.")
+      return 2
+  elif(inicio>horario_inic):
+    if(inicio<horario_fin):
+      #se intersectan
+      return 1
+    elif(inicio>=horario_fin):
+      # bloque de tiempo comienza justo cuando termina la clase
+      return 0
+    else:
+      print(Fore.RED+"Error inesperado en la comparacion de horas.")
+      return 2
+  elif(inicio == horario_inic):
+    return 1
+  else:
+    print(Fore.RED+"Error inesperado en la comparacion de horas.")
+    return 2
 
 
+def separar_inicio_fin(horas):
+  #devuelve un array de 2 donde tiene el inicio y fin de la asignatura
+  #09:15 - 12:15
+  aux1_hora = horas[0:2]
+  aux1_min = horas[3:5]
 
-def guardar_materia(hoja, fila_materia):
+  aux2_hora = horas[8:10]
+  aux2_min = horas[11:13]
+
+  inicio = time(int(aux1_hora),int(aux1_min))
+  fin = time(int(aux2_hora),int(aux2_min))
+
+  #print("Inicio:",inicio)
+  #print("Fin:",fin)
+  return [inicio,fin]
+
+def buscar_aulas_vacias(dia,inicio,fin):
+  #dia es la columna del dia que queremos revisar
+  #inicio es el inicio del bloque de tiempo que estamos buscando
+  #fin es el fin del bloque
+  global aulas
+  for carr in carreras:
+    #print(Fore.YELLOW+"Carrera: "+Fore.WHITE+carr)
+    hoja = doc[carr]
+    for i in range(12,hoja.max_row+1):
+      if(hoja.cell(row=i,column=dia).value is not None):
+        hora = separar_inicio_fin(str(hoja.cell(row=i,column=dia).value))
+        solapa = comparar_horas(inicio,fin,hora[0],hora[1])
+        match solapa:
+          case 1:
+            #eliminar aula del array
+            for bloque in aulas:
+              if(hoja.cell(row=i,column=dia-1).value in bloque):
+                bloque.remove(hoja.cell(row=i,column=dia-1).value)
+          case 2:
+            print("Ha ocurrido un error inesperado.")
+            return
+
+
+def guardar_materia(hoja_p, fila_materia):
+  cant = hoja2.max_row
   for i in range (1, columnas + 1):
-    hoja2.cell(row = filas2 + 1, column = i).value = hoja.cell(row = fila_materia, column = i).value
+    hoja2.cell(row = cant + 1, column = i).value = hoja_p.cell(row = fila_materia, column = i).value
     
   doc2.save(path2)
   print("Materia añadida exitosamente.")
+
 
 def encontrar_aulas():
   #print("[green]Cargando...")
@@ -206,7 +324,11 @@ def encontrar_aulas():
   busqueda = int(input())
   seleccion = resultados[busqueda-1] #es la fila de la materia seleccionada
 
-  imprimir_info_materia_2(hoja,seleccion)
+  print("Materia: ", hoja.cell(row = seleccion, column = col_materia).value, " - ", hoja.cell(row = seleccion, column = col_seccion).value)
+  print("Profesor: ",hoja.cell(row = seleccion, column = col_prof_titulo).value,hoja.cell(row = seleccion, column= col_prof_nombre).value,hoja.cell(row = seleccion, column= col_prof_apellido).value)
+  aux_dia = [[]]
+  aux_dia[0] = crear_linea_horario(hoja,seleccion)
+  print(tabulate(aux_dia,headers=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"]))
 
   print("\nDesea guardar esta materia en su horario?")
   print("1- Si\n2- No")
@@ -218,25 +340,91 @@ def encontrar_aulas():
   return
 
 
+def encontrar_vacias():
+  while(True):
+    print("\nSeleccione el dia que quiere revisar.\n1-Lunes\n2-Martes\n3-Miercoles\n4-Jueves\n5-Viernes\n6-Sabado\n7-Volver")
+    try:
+      selec_dia = int(input())
+    except Exception as e:
+      print("Por favor ingrese un numero.")
+    else:
+      if (0 < selec_dia < 7):
+        while(True):
+          print("\nSeleccione el inicio del rango de tiempo que desea (formato HH:MM):")
+          selec_inicio = input()
+          try:
+            aux_1 = int(selec_inicio[0:2])
+            aux_2 = int(selec_inicio[3:5])
+            inicio = time(aux_1,aux_2)
+          except Exception as e:
+            print("No es un formato de hora aceptado.")
+          else:
+            for i in range(100):
+              print("\nSeleccione el fin del rango de tiempo que desea (formato HH:MM):")
+              selec_fin = input()
+              try:
+                aux_1 = int(selec_fin[0:2])
+                aux_2 = int(selec_fin[3:5])
+                fin = time(aux_1,aux_2)
+              except Exception as e:
+                print("No es un formato de hora aceptado.")
+              else:
+                match selec_dia:
+                  case 1:
+                    aux_dia = col_lunes
+                  case 2:
+                    aux_dia = col_martes
+                  case 3:
+                    aux_dia = col_miercoles
+                  case 4:
+                    aux_dia = col_jueves
+                  case 5:
+                    aux_dia = col_viernes
+                  case 6:
+                    aux_dia = col_sabado
+                  case _:
+                    print("Se ha producido un error.")
+                    return
+                buscar_aulas_vacias(aux_dia,inicio,fin)
+                break
+          break  
+      elif(selec_dia == 7):
+        break
+      else:
+        print("Esa no es una seleccion valida.")
+    #FOR TESTING
+    #separar_inicio_fin("09:15 - 12:15")
+    break
+  print("\nAulas vacias:")
+  print("Bloque A:",aulas[0])
+  print("Bloque B:",aulas[1])
+  print("Bloque C:",aulas[2])
+  print("Bloque E:",aulas[3])
+  print("Bloque F:",aulas[4])
+  print("Bloque H:",aulas[5])
+  print("Bloque I:",aulas[6])
+  refrescar_aulas()
+  return
+
 while (True):
+  refrescar_aulas()
+  #os.system('cls')
   print("Bienvenido al programa de aulas!")
   print("Qué desea hacer?")
-  print("1-Ver horario y aula.\n2-Ver aulas vacías.\n3-Ver horario guardado\n4-Salir")
+  print("1-Ver horario y aula.\n2-Ver aulas vacías.\n3-Ver horario guardado\n4-Eliminar materia guardada\n5-Salir")
   accion = int(input())
-  if(accion < 1 or accion > 4):
-    print("Esa no es una opción válida.")
 
-  if(accion == 4):
-    break
-
-  if(accion == 1):
-    encontrar_aulas()
-    break
-
-  if(accion == 2):
-    #encontrar_vacias()
-    break
-
-  if(accion == 3):
-    #ver_horario()
-    break
+  match accion:
+    case 1:
+      encontrar_aulas()
+    case 2:
+      encontrar_vacias()
+    case 3:
+      ver_horario()
+    case 4:
+      modificar_horario()
+    case 5:
+      break
+    case _:
+      print("Esa no es una opción válida.")
+  
