@@ -149,7 +149,7 @@ def ver_horario():
   #print("mat_aux:",mat_aux)
   #print("linea_aux:",linea_aux)
 
-  if(len(mat_aux[0]) != 0):
+  if(len(mat_aux) != 0):
     print(tabulate(mat_aux,headers=["Materia","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"]))
   else:
     print("\nNo hay materias guardadas.")
@@ -167,7 +167,7 @@ def eliminar_materia(fila_materia):
 def eliminar_todas():
   if (hoja2.max_row != 0):
 
-    for i in range(1,hoja2.max_row):
+    for i in range(1,hoja2.max_row+1):
       hoja2.delete_rows(i)
 
   doc2.save(path2)
@@ -176,38 +176,43 @@ def eliminar_todas():
 def modificar_horario():
 
   while(True):
-    print("Elija la materia que desea eliminar")
-    for i in range(1,hoja2.max_row+1):
-      print(i,"-",hoja2.cell(row = i,column=col_materia).value,"-",hoja2.cell(row=i,column=col_seccion).value,"- Prof",hoja2.cell(row=i,column=col_prof_titulo).value,hoja2.cell(row=i,column=col_prof_nombre).value,hoja2.cell(row=i,column=col_prof_apellido).value)
+    if(hoja2.cell(row=1,column=1).value is not None):
+      print("Elija la materia que desea eliminar")
+      for i in range(1,hoja2.max_row+1):
+        print(i,"-",hoja2.cell(row = i,column=col_materia).value,"-",hoja2.cell(row=i,column=col_seccion).value,"- Prof",hoja2.cell(row=i,column=col_prof_titulo).value,hoja2.cell(row=i,column=col_prof_nombre).value,hoja2.cell(row=i,column=col_prof_apellido).value)
 
-    print(hoja2.max_row+1,"- Todas")
-    print(hoja2.max_row+2,"- Volver al menu")
+      print(hoja2.max_row+1,"- Todas")
+      print(hoja2.max_row+2,"- Volver al menu")
 
-    seleccion = int(input())
+      seleccion = int(input())
 
-    if (0 < seleccion <= hoja2.max_row):
-      print("Esta seguro? Escriba si para continuar, escriba otra cosa para cancelar.")
-      conf = input().lower()
-      if(conf == "si"):
-        eliminar_materia(seleccion)
-        print("Materia eliminada exitosamente.")
+      if (0 < seleccion <= hoja2.max_row):
+        print("Esta seguro? Escriba si para continuar, escriba otra cosa para cancelar.")
+        conf = input().lower()
+        if(conf == "si"):
+          eliminar_materia(seleccion)
+          print("Materia eliminada exitosamente.")
+          break
+        else:
+          break
+      elif(seleccion == hoja2.max_row+1):
+        print("Esta seguro de querer eliminar todo? Escriba si para continuar, escriba otra cosa para cancelar.")
+        conf = input().lower()
+        if(conf == "si"):
+          eliminar_todas()
+          print("Horario borrado exitosamente.")
+          break
+        else:
+          break
+      elif(seleccion == hoja2.max_row+2):
         break
       else:
-        break
-    elif(seleccion == hoja2.max_row+1):
-      print("Esta seguro de querer eliminar todo? Escriba si para continuar, escriba otra cosa para cancelar.")
-      conf = input().lower()
-      if(conf == "si"):
-        eliminar_todas()
-        print("Horario borrado exitosamente.")
-        break
-      else:
-        break
-    elif(seleccion == hoja2.max_row+2):
-      break
+        print("Esa no es una seleccion valida.")
     else:
-      print("Esa no es una seleccion valida.")
-
+      print("\nNo hay materias guardadas.")
+      print("\n\nPresione enter para continuar.")
+      input()
+      return
   return
 
 def comparar_horas(inicio,fin,horario_inic,horario_fin):
@@ -299,12 +304,14 @@ def guardar_materia(hoja_p, fila_materia):
     
   doc2.save(path2)
   print("Materia añadida exitosamente.")
+  print("\n\nPresione enter para continuar.")
+  input()
 
 
 def encontrar_aulas():
   #print("[green]Cargando...")
   #doc = openpyxl.load_workbook(path)
-  print("Introduzca el nombre de carrera (en siglas)")
+  print("\nIntroduzca el nombre de carrera (en siglas)")
 
   while(True):
     carrera = input().upper()
@@ -313,12 +320,12 @@ def encontrar_aulas():
       hoja = doc[carreras[carreras_upper.index(carrera)]]
       break
     else:
-      print("No se pudo encontrar la carrera. Intente de nuevo")
+      print("\nNo se pudo encontrar la carrera. Intente de nuevo")
 
   # El test imprime la celda F12 que siempre tiene las siglas de la carrera
   # print("Test para ver si se abrio bien: ", hoja['F12'].value)
   while(True):
-    print("Introduzca el nombre de la materia (palabras claves, si no esta escrito exactamente no funciona.)")
+    print("\nIntroduzca el nombre de la materia (palabras claves, si no esta escrito exactamente no funciona.)")
     busqueda = input()
     resultados = [] #almacena los numeros de filas de resultados de la busqueda
     filas = hoja.max_row
@@ -331,14 +338,14 @@ def encontrar_aulas():
         resultados.append(i)
 
     if (len(resultados) == 0):
-      print("No se encontro ninguna materia con ese nombre. Intente de nuevo.")
+      print("\nNo se encontro ninguna materia con ese nombre. Intente de nuevo.")
     else:
       break
 
   for i in range (len(resultados)):
     print(i+1,"-",hoja.cell(row=resultados[i],column=col_materia).value," - ",hoja.cell(row=resultados[i],column=col_seccion).value)
 
-  print("Introduzca la clase de la cual quiere información")
+  print("\nIntroduzca la clase de la cual quiere información")
   busqueda = int(input())
   seleccion = resultados[busqueda-1] #es la fila de la materia seleccionada
 
@@ -348,8 +355,8 @@ def encontrar_aulas():
   aux_dia[0] = crear_linea_horario(hoja,seleccion)
   print(tabulate(aux_dia,headers=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"]))
 
-  print("\nDesea guardar esta materia en su horario?")
-  print("1- Si\n2- No")
+  print(Fore.GREEN+"\nDesea guardar esta materia en su horario?"+Fore.WHITE)
+  print("1- Si\n2- No\n")
   resp = int(input())
   if (resp == 1):
     guardar_materia(hoja, seleccion)
@@ -364,7 +371,7 @@ def encontrar_vacias():
     try:
       selec_dia = int(input())
     except Exception as e:
-      print("Por favor ingrese un numero.")
+      print("\nPor favor ingrese un numero.")
     else:
       if (0 < selec_dia < 7):
         while(True):
@@ -382,9 +389,9 @@ def encontrar_vacias():
               aux_2 = int(selec_inicio[2:4])
               inicio = time(aux_1,aux_2)
             else:
-              ("No es un formato de hora aceptado.")
+              ("\nNo es un formato de hora aceptado.")
           except Exception as e:
-            print("No es un formato de hora aceptado.")
+            print("\nNo es un formato de hora aceptado.")
           else:
             for i in range(100):
               print("\nSeleccione el fin del rango de tiempo que desea (formato HH:MM):")
@@ -399,9 +406,9 @@ def encontrar_vacias():
                   aux_2 = int(selec_fin[2:4])
                   fin = time(aux_1,aux_2)
                 else:
-                  ("No es un formato de hora aceptado.")
+                  ("\nNo es un formato de hora aceptado.")
               except Exception as e:
-                print("No es un formato de hora aceptado.")
+                print("\nNo es un formato de hora aceptado.")
               else:
                 match selec_dia:
                   case 1:
@@ -417,7 +424,7 @@ def encontrar_vacias():
                   case 6:
                     aux_dia = col_sabado
                   case _:
-                    print("Se ha producido un error.")
+                    print(Fore.RED+"\nSe ha producido un error.")
                     return
                 buscar_aulas_vacias(aux_dia,inicio,fin)
                 print("\nAulas vacias:")
@@ -433,7 +440,7 @@ def encontrar_vacias():
       elif(selec_dia == 7):
         break
       else:
-        print("Esa no es una seleccion valida.")
+        print("\nEsa no es una seleccion valida.")
     #FOR TESTING
     #separar_inicio_fin("09:15 - 12:15")
     break
@@ -443,9 +450,9 @@ def encontrar_vacias():
 while (True):
   refrescar_aulas()
   #os.system('cls')
-  print("Bienvenido al programa de aulas!")
-  print("Qué desea hacer?")
-  print("1-Ver horario y aula.\n2-Ver aulas vacías.\n3-Ver horario guardado\n4-Eliminar materia guardada\n5-Salir")
+  print(Fore.CYAN+"\n\nBienvenido al programa de aulas!")
+  print("\nQué desea hacer?")
+  print("\n1-Ver horario y aula.\n2-Ver aulas vacías.\n3-Ver horario guardado\n4-Eliminar materia guardada\n5-Salir\n"+Fore.WHITE)
   accion = int(input())
 
   match accion:
