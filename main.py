@@ -165,10 +165,8 @@ def eliminar_materia(fila_materia):
   return
 
 def eliminar_todas():
-  if (hoja2.max_row != 0):
-
-    for i in range(1,hoja2.max_row+1):
-      hoja2.delete_rows(i)
+  for i in range(1,hoja2.max_row+1):
+    hoja2.delete_rows(i)
 
   doc2.save(path2)
   return
@@ -191,18 +189,20 @@ def modificar_horario():
         conf = input().lower()
         if(conf == "si"):
           eliminar_materia(seleccion)
-          print("Materia eliminada exitosamente.")
+          print(Fore.RED+"Materia eliminada exitosamente."+Fore.WHITE)
           break
         else:
+          print(Fore.YELLOW+"No se ha eliminado la materia."+Fore.WHITE)
           break
       elif(seleccion == hoja2.max_row+1):
         print("Esta seguro de querer eliminar todo? Escriba si para continuar, escriba otra cosa para cancelar.")
         conf = input().lower()
         if(conf == "si"):
           eliminar_todas()
-          print("Horario borrado exitosamente.")
+          print(Fore.RED+"Horario borrado exitosamente."+Fore.WHITE)
           break
         else:
+          print(Fore.YELLOW+"No se ha borrado el horario."+Fore.WHITE)
           break
       elif(seleccion == hoja2.max_row+2):
         break
@@ -298,6 +298,8 @@ def guardar_materia(hoja_p, fila_materia):
     cant = hoja2.max_row
   elif(hoja2.max_row == 1 and hoja2.cell(row=1,column=1).value is None):
     cant = 0
+  else:
+    cant = hoja2.max_row
   
   for i in range (1, columnas + 1):
     hoja2.cell(row = cant + 1, column = i).value = hoja_p.cell(row = fila_materia, column = i).value
