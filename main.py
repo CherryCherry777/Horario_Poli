@@ -397,8 +397,10 @@ def encontrar_vacias():
     else:
       if (0 < selec_dia < 7):
         while(True):
-          print("\nSeleccione el inicio del rango de tiempo que desea (formato HH:MM):")
+          print("\nSeleccione el inicio del rango de tiempo que desea (formato HH:MM). Escriba salir para volver al menu.")
           selec_inicio = input()
+          if(selec_inicio.lower() == "salir"):
+            return
           try:
             #08:00
             #8:00
@@ -416,8 +418,10 @@ def encontrar_vacias():
             print("\nNo es un formato de hora aceptado.")
           else:
             for i in range(100):
-              print("\nSeleccione el fin del rango de tiempo que desea (formato HH:MM):")
+              print("\nSeleccione el fin del rango de tiempo que desea (formato HH:MM). Escriba salir para volver al menu.")
               selec_fin = input()
+              if(selec_inicio.lower() == "salir"):
+                return
               try:
                 if(len(selec_fin) == 5):
                   aux_1 = int(selec_fin[0:2])
@@ -432,6 +436,9 @@ def encontrar_vacias():
               except Exception as e:
                 print("\nNo es un formato de hora aceptado.")
               else:
+                if(inicio > fin):
+                  print("La hora de fin no puede ser menor a la hora de inicio.")
+                  return
                 match selec_dia:
                   case 1:
                     aux_dia = col_lunes
