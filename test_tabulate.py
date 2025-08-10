@@ -1,3 +1,4 @@
+import unicodedata
 from tabulate import tabulate
 import openpyxl
 from openpyxl import Workbook
@@ -29,3 +30,9 @@ else:
   hoja2 = doc2.active
 
 print("Para un archivo vacio hay",hoja2.max_row,"filas")
+
+def strip_accents(s):
+   return ''.join(c for c in unicodedata.normalize('NFD', s)
+                  if unicodedata.category(c) != 'Mn')
+
+print(strip_accents("Los acentos me están matando!! áéíóúÁÉÍÓÚ"))

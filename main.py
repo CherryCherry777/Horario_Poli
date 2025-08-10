@@ -8,6 +8,8 @@ from colorama import Fore
 import os
 from tabulate import tabulate
 from datetime import time
+import unicodedata
+
 print(Fore.GREEN + "Cargando..." + Fore.WHITE)
 path = "horario.xlsx"
 path2 = "horario_guardado.xlsx"
@@ -39,6 +41,7 @@ else:
 
 #TODO try except every input so that there arent sudden errors
 #TODO change every while(True) to a loop of max 100
+#TODO hacer que no se pueda añadir la misma materia mas de una vez
 
 
 
@@ -96,6 +99,9 @@ def refrescar_aulas():
 
 #hoja = doc[nombreHoja]
 
+def strip_accents(s):
+   return ''.join(c for c in unicodedata.normalize('NFD', s)
+                  if unicodedata.category(c) != 'Mn')
 
 def crear_linea_horario(hoja, fila_materia):
   mat_aux = []
@@ -293,15 +299,25 @@ def buscar_aulas_vacias(dia,inicio,fin):
             print("Ha ocurrido un error inesperado.")
             return
 
+def verificar_duplicacion(hoja_p,fila_materia):
+  #devuelve 1 si es duplicado
+  #columna 1 es el codigo de clase, 5 es el codigo de carrera
+  for i in range(1,hoja2.max_row + 1):
+    if(hoja2.cell(row=i,column=1).value == hoja_p.cell(row=fila_materia,column=1).value and hoja2.cell(row=i,column=5).value == hoja_p.cell(row=fila_materia,column=5).value):
+      return 1
+    else:
+      return 0
+  return 0
 
 def guardar_materia(hoja_p, fila_materia):
+  #verificar_duplicacion(fila_materia)
   if(hoja2.max_row == 1 and hoja2.cell(row=1,column=1).value is not None):
     cant = hoja2.max_row
   elif(hoja2.max_row == 1 and hoja2.cell(row=1,column=1).value is None):
     cant = 0
   else:
     cant = hoja2.max_row
-  
+
   for i in range (1, columnas + 1):
     hoja2.cell(row = cant + 1, column = i).value = hoja_p.cell(row = fila_materia, column = i).value
     
@@ -337,7 +353,7 @@ def encontrar_aulas():
     for i in range(12, filas + 1):
       #test
       #print("Test: ",hoja.cell(row = i, column = 3).value)
-      if (busqueda.lower() in str(hoja.cell(row = i, column = col_materia).value).lower()):
+      if (strip_accents(busqueda.lower()) in strip_accents(str(hoja.cell(row = i, column = col_materia).value).lower())):
         resultados.append(i)
 
     if (len(resultados) == 0):
@@ -362,7 +378,10 @@ def encontrar_aulas():
   print("1- Si\n2- No\n")
   resp = int(input())
   if (resp == 1):
-    guardar_materia(hoja, seleccion)
+    if(verificar_duplicacion(hoja,seleccion) == 0):
+      guardar_materia(hoja, seleccion)
+    else:
+      print(Fore.RED+"Ya se ha registrado esa materia anteriormente."+Fore.WHITE)
 
 
   return
