@@ -137,13 +137,17 @@ def crear_linea_horario(hoja, fila_materia):
 
 def ver_horario():
   #esto es para imprimir el horario guardado
-  mat_aux = [[]]
+  mat_aux = []
   linea_aux = []
   for i in range(1,hoja2.max_row+1):
     if(hoja2.cell(row=i,column=col_materia).value is not None):
       linea_aux = crear_linea_horario(hoja2,i)
       linea_aux.insert(0,str(hoja2.cell(row=i,column=col_materia).value)+" "+str(hoja2.cell(row=i,column=col_seccion).value))
       mat_aux.append(linea_aux)
+
+  #testing
+  #print("mat_aux:",mat_aux)
+  #print("linea_aux:",linea_aux)
 
   if(len(mat_aux[0]) != 0):
     print(tabulate(mat_aux,headers=["Materia","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"]))
@@ -238,14 +242,24 @@ def comparar_horas(inicio,fin,horario_inic,horario_fin):
 def separar_inicio_fin(horas):
   #devuelve un array de 2 donde tiene el inicio y fin de la asignatura
   #09:15 - 12:15
+  #10:00 12:15
   aux1_hora = horas[0:2]
   aux1_min = horas[3:5]
 
-  aux2_hora = horas[8:10]
-  aux2_min = horas[11:13]
-
-  inicio = time(int(aux1_hora),int(aux1_min))
-  fin = time(int(aux2_hora),int(aux2_min))
+  if(len(horas) == 11):
+    aux2_hora = horas[6:8]
+    aux2_min = horas[9:11]
+  else:
+    aux2_hora = horas[8:10]
+    aux2_min = horas[11:13]
+  
+  try:
+    inicio = time(int(aux1_hora),int(aux1_min))
+    fin = time(int(aux2_hora),int(aux2_min))
+  except Exception as e:
+    print("Hubo un problema con la celda de contenido:", horas)
+    input()
+    quit()
 
   #print("Inicio:",inicio)
   #print("Fin:",fin)
@@ -275,7 +289,11 @@ def buscar_aulas_vacias(dia,inicio,fin):
 
 
 def guardar_materia(hoja_p, fila_materia):
-  cant = hoja2.max_row
+  if(hoja2.max_row == 1 and hoja2.cell(row=1,column=1).value is not None):
+    cant = hoja2.max_row
+  elif(hoja2.max_row == 1 and hoja2.cell(row=1,column=1).value is None):
+    cant = 0
+  
   for i in range (1, columnas + 1):
     hoja2.cell(row = cant + 1, column = i).value = hoja_p.cell(row = fila_materia, column = i).value
     
@@ -353,9 +371,18 @@ def encontrar_vacias():
           print("\nSeleccione el inicio del rango de tiempo que desea (formato HH:MM):")
           selec_inicio = input()
           try:
-            aux_1 = int(selec_inicio[0:2])
-            aux_2 = int(selec_inicio[3:5])
-            inicio = time(aux_1,aux_2)
+            #08:00
+            #8:00
+            if(len(selec_inicio) == 5):
+              aux_1 = int(selec_inicio[0:2])
+              aux_2 = int(selec_inicio[3:5])
+              inicio = time(aux_1,aux_2)
+            elif(len(selec_inicio) == 4):
+              aux_1 = int(selec_inicio[0:1])
+              aux_2 = int(selec_inicio[2:4])
+              inicio = time(aux_1,aux_2)
+            else:
+              ("No es un formato de hora aceptado.")
           except Exception as e:
             print("No es un formato de hora aceptado.")
           else:
@@ -363,9 +390,16 @@ def encontrar_vacias():
               print("\nSeleccione el fin del rango de tiempo que desea (formato HH:MM):")
               selec_fin = input()
               try:
-                aux_1 = int(selec_fin[0:2])
-                aux_2 = int(selec_fin[3:5])
-                fin = time(aux_1,aux_2)
+                if(len(selec_fin) == 5):
+                  aux_1 = int(selec_fin[0:2])
+                  aux_2 = int(selec_fin[3:5])
+                  fin = time(aux_1,aux_2)
+                elif(len(selec_fin) == 4):
+                  aux_1 = int(selec_fin[0:1])
+                  aux_2 = int(selec_fin[2:4])
+                  fin = time(aux_1,aux_2)
+                else:
+                  ("No es un formato de hora aceptado.")
               except Exception as e:
                 print("No es un formato de hora aceptado.")
               else:
@@ -386,6 +420,14 @@ def encontrar_vacias():
                     print("Se ha producido un error.")
                     return
                 buscar_aulas_vacias(aux_dia,inicio,fin)
+                print("\nAulas vacias:")
+                print("Bloque A:",aulas[0])
+                print("Bloque B:",aulas[1])
+                print("Bloque C:",aulas[2])
+                print("Bloque E:",aulas[3])
+                print("Bloque F:",aulas[4])
+                print("Bloque H:",aulas[5])
+                print("Bloque I:",aulas[6])
                 break
           break  
       elif(selec_dia == 7):
@@ -395,14 +437,6 @@ def encontrar_vacias():
     #FOR TESTING
     #separar_inicio_fin("09:15 - 12:15")
     break
-  print("\nAulas vacias:")
-  print("Bloque A:",aulas[0])
-  print("Bloque B:",aulas[1])
-  print("Bloque C:",aulas[2])
-  print("Bloque E:",aulas[3])
-  print("Bloque F:",aulas[4])
-  print("Bloque H:",aulas[5])
-  print("Bloque I:",aulas[6])
   refrescar_aulas()
   return
 
