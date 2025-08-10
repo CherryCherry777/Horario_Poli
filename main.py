@@ -40,7 +40,6 @@ else:
 
 
 #TODO try except every input so that there arent sudden errors
-#TODO change every while(True) to a loop of max 100
 #TODO hacer que no se pueda añadir la misma materia mas de una vez
 
 
@@ -180,7 +179,7 @@ def eliminar_todas():
 
 def modificar_horario():
 
-  while(True):
+  for lp in range(100):
     if(hoja2.cell(row=1,column=1).value is not None):
       print("Elija la materia que desea eliminar")
       for i in range(1,hoja2.max_row+1):
@@ -332,7 +331,7 @@ def encontrar_aulas():
   #doc = openpyxl.load_workbook(path)
   print("\nIntroduzca el nombre de carrera (en siglas)")
 
-  while(True):
+  for lp in range(100):
     carrera = input().upper()
     if(carrera in carreras_upper):
       #esto es para asegurar que incluso si no se escribe con las mayusculas o minusculas correctas, igual funcione
@@ -343,7 +342,7 @@ def encontrar_aulas():
 
   # El test imprime la celda F12 que siempre tiene las siglas de la carrera
   # print("Test para ver si se abrio bien: ", hoja['F12'].value)
-  while(True):
+  for lp in range(100):
     print("\nIntroduzca el nombre de la materia (palabras claves, si no esta escrito exactamente no funciona.)")
     busqueda = input()
     resultados = [] #almacena los numeros de filas de resultados de la busqueda
@@ -388,7 +387,7 @@ def encontrar_aulas():
 
 
 def encontrar_vacias():
-  while(True):
+  for lp in range(100):
     print("\nSeleccione el dia que quiere revisar.\n1-Lunes\n2-Martes\n3-Miercoles\n4-Jueves\n5-Viernes\n6-Sabado\n7-Volver")
     try:
       selec_dia = int(input())
@@ -396,7 +395,7 @@ def encontrar_vacias():
       print("\nPor favor ingrese un numero.")
     else:
       if (0 < selec_dia < 7):
-        while(True):
+        for lp in range(100):
           print("\nSeleccione el inicio del rango de tiempo que desea (formato HH:MM). Escriba salir para volver al menu.")
           selec_inicio = input()
           if(selec_inicio.lower() == "salir"):
